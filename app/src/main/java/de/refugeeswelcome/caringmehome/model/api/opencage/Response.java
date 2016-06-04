@@ -8,9 +8,9 @@ import java.util.List;
  * Created by root1 on 04/06/16.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class OpenCageResponse {
+public class Response {
 
-    List<OpenCageAnnotations> results;
+    List<Annotation> results;
 
     private Integer total_results;
 
@@ -22,11 +22,11 @@ public class OpenCageResponse {
         this.total_results = total_results;
     }
 
-    public List<OpenCageAnnotations> getResults() {
+    public List<Annotation> getResults() {
         return results;
     }
 
-    public void setResults(List<OpenCageAnnotations> results) {
+    public void setResults(List<Annotation> results) {
         this.results = results;
     }
 }

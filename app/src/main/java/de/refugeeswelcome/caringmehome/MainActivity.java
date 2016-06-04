@@ -16,8 +16,8 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.refugeeswelcome.caringmehome.model.api.opencage.OpenCageAnnotations;
-import de.refugeeswelcome.caringmehome.model.api.opencage.OpenCageResponse;
+import de.refugeeswelcome.caringmehome.model.api.opencage.Annotation;
+import de.refugeeswelcome.caringmehome.model.api.opencage.Response;
 import de.refugeeswelcome.caringmehome.util.GeocoderAPI;
 import de.refugeeswelcome.caringmehome.util.LocationSuggestion;
 import de.refugeeswelcome.caringmehome.util.OpenCageGeocoder;
@@ -25,7 +25,6 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -69,16 +68,16 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(Call call, okhttp3.Response response) throws IOException {
                 try {
                     String jsonData = response.body().string();
 
                     ObjectMapper mapper = new ObjectMapper();
-                    OpenCageResponse res = mapper.readValue(jsonData, OpenCageResponse.class);
+                    Response res = mapper.readValue(jsonData, Response.class);
 
                     List<SearchSuggestion> suggestions = new LinkedList<>();
 
-                    for (OpenCageAnnotations annotations : res.getResults()) {
+                    for (Annotation annotations : res.getResults()) {
                         suggestions.add(new LocationSuggestion(annotations.getFormatted()));
                     }
 
@@ -116,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(Call call, okhttp3.Response response) throws IOException {
                 try {
                     String jsonData = response.body().string();
                     Log.d(TAG, jsonData);
