@@ -89,9 +89,14 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void showSuggestions(List<SearchSuggestion> suggestions) {
-        mSearchView.swapSuggestions(suggestions);
-        mSearchView.showProgress();
+    public void showSuggestions(final List<SearchSuggestion> suggestions) {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mSearchView.swapSuggestions(suggestions);
+                mSearchView.showProgress();
+            }
+        });
     }
 
     /**
