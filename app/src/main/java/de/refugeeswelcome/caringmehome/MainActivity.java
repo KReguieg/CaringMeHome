@@ -8,6 +8,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.arlib.floatingsearchview.FloatingSearchView;
+import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -17,6 +19,7 @@ import java.util.List;
 import de.refugeeswelcome.caringmehome.model.api.opencage.OpenCageAnnotations;
 import de.refugeeswelcome.caringmehome.model.api.opencage.OpenCageResponse;
 import de.refugeeswelcome.caringmehome.util.GeocoderAPI;
+import de.refugeeswelcome.caringmehome.util.LocationSuggestion;
 import de.refugeeswelcome.caringmehome.util.OpenCageGeocoder;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -28,11 +31,26 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getName();
     String mTameResponse;
+    FloatingSearchView mSearchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mSearchView = (FloatingSearchView) findViewById(R.id.floating_search_view);
+        mSearchView.setOnQueryChangeListener(new FloatingSearchView.OnQueryChangeListener() {
+            @Override
+            public void onSearchTextChanged(String oldQuery, final String newQuery) {
+
+                //get suggestions based on newQuery
+                search(newQuery);
+                //pass them on to the search view
+
+            }
+        });
+
+
 
         if (isNetworkAvailable()) {
             callTameApi();
@@ -58,10 +76,10 @@ public class MainActivity extends AppCompatActivity {
                     ObjectMapper mapper = new ObjectMapper();
                     OpenCageResponse res = mapper.readValue(jsonData, OpenCageResponse.class);
 
-                    List<String> suggestions = new LinkedList<String>();
+                    List<SearchSuggestion> suggestions = new LinkedList<>();
 
                     for (OpenCageAnnotations annotations : res.getResults()) {
-                        suggestions.add(annotations.getFormatted());
+                        suggestions.add(new LocationSuggestion(annotations.getFormatted()));
                     }
 
                     showSuggestions(suggestions);
@@ -72,8 +90,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void showSuggestions(List<String> suggestions) {
-        //@TODO fill the ui list with suggestions
+    public void showSuggestions(List<SearchSuggestion> suggestions) {
+        mSearchView.swapSuggestions(suggestions);
+        mSearchView.showProgress();
     }
 
     /**
