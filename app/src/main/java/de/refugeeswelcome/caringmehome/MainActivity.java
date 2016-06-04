@@ -9,12 +9,13 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
-import de.refugeeswelcome.caringmehome.model.OpenCageAnnotations;
-import de.refugeeswelcome.caringmehome.model.OpenCageResponse;
+import de.refugeeswelcome.caringmehome.model.opencage.OpenCageAnnotations;
+import de.refugeeswelcome.caringmehome.model.opencage.OpenCageResponse;
 import de.refugeeswelcome.caringmehome.util.GeocoderAPI;
 import de.refugeeswelcome.caringmehome.util.OpenCageGeocoder;
 import okhttp3.Call;
@@ -35,34 +36,43 @@ public class MainActivity extends AppCompatActivity {
 
         if (isNetworkAvailable()) {
             callTameApi();
-            GeocoderAPI geocoder = new OpenCageGeocoder();
-            geocoder.location("Gransee, Deutschland", new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    Log.e(TAG, e.getMessage());
-                }
-
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
-                    try {
-                        String jsonData = response.body().string();
-
-                        ObjectMapper mapper = new ObjectMapper();
-                        OpenCageResponse res = mapper.readValue(jsonData, OpenCageResponse.class);
-
-                        for (OpenCageAnnotations annotations : res.getResults()) {
-                            annotations.getFormatted();
-                        }
-
-                        Log.d(TAG, jsonData);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
         } else {
             Toast.makeText(this, R.string.network_notavailable, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void search(String searchText) {
+        GeocoderAPI geocoder = new OpenCageGeocoder();
+        geocoder.location(searchText, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.e(TAG, e.getMessage());
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                try {
+                    String jsonData = response.body().string();
+
+                    ObjectMapper mapper = new ObjectMapper();
+                    OpenCageResponse res = mapper.readValue(jsonData, OpenCageResponse.class);
+
+                    List<String> suggestions = new LinkedList<String>();
+
+                    for (OpenCageAnnotations annotations : res.getResults()) {
+                        suggestions.add(annotations.getFormatted());
+                    }
+
+                    showSugggestions(suggestions);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    public void showSugggestions(List<String> suggestions) {
+
     }
 
     /**

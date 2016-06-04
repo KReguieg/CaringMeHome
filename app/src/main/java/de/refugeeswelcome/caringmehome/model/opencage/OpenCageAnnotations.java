@@ -1,8 +1,6 @@
-package de.refugeeswelcome.caringmehome.model;
+package de.refugeeswelcome.caringmehome.model.opencage;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-import de.refugeeswelcome.caringmehome.util.OpenCageGeocoder;
 
 /**
  * Created by root1 on 04/06/16.
