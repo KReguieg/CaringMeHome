@@ -14,8 +14,8 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.refugeeswelcome.caringmehome.model.opencage.OpenCageAnnotations;
-import de.refugeeswelcome.caringmehome.model.opencage.OpenCageResponse;
+import de.refugeeswelcome.caringmehome.model.api.opencage.OpenCageAnnotations;
+import de.refugeeswelcome.caringmehome.model.api.opencage.OpenCageResponse;
 import de.refugeeswelcome.caringmehome.util.GeocoderAPI;
 import de.refugeeswelcome.caringmehome.util.OpenCageGeocoder;
 import okhttp3.Call;

@@ -1,4 +1,4 @@
-package de.refugeeswelcome.caringmehome.model.opencage;
+package de.refugeeswelcome.caringmehome.model.api.opencage;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
