@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //@TODO gets called by button or searchfield
     public void search(String searchText) {
         GeocoderAPI geocoder = new OpenCageGeocoder();
         geocoder.location(searchText, new Callback() {
@@ -63,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
                         suggestions.add(annotations.getFormatted());
                     }
 
-                    showSugggestions(suggestions);
+                    showSuggestions(suggestions);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -71,8 +72,8 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void showSugggestions(List<String> suggestions) {
-
+    public void showSuggestions(List<String> suggestions) {
+        //@TODO fill the ui list with suggestions
     }
 
     /**
