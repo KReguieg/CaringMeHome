@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
      * @return The JSON response as String.
      */
     private void callTameApi() {
-        String tameApiCallUrl = urlBuilder();
+        String tameApiCallUrl = urlBuilder("Damaskus");
 
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
@@ -87,9 +87,9 @@ public class MainActivity extends AppCompatActivity {
      *
      * @return the assembled API Call Url as a String.
      */
-    private String urlBuilder() {
+    private String urlBuilder(String city) {
         String baseUrl = "https://tame.it/hashtrends/results.json?api_key=A3PLzmqMwumyjzD1dEhU";
-        String location = "&source=global&term=DamaskusDamaskus";
+        String location = "&source=global&term=" + city;
         String options = "&with_subscription=true&only=links&lang=all";
         return baseUrl + location + options;
     }
