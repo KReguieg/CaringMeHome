@@ -8,8 +8,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+
 import java.io.IOException;
 
+import de.refugeeswelcome.caringmehome.model.OpenCageAnnotations;
+import de.refugeeswelcome.caringmehome.model.OpenCageResponse;
+import de.refugeeswelcome.caringmehome.util.GeocoderAPI;
+import de.refugeeswelcome.caringmehome.util.OpenCageGeocoder;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -28,6 +35,31 @@ public class MainActivity extends AppCompatActivity {
 
         if (isNetworkAvailable()) {
             callTameApi();
+            GeocoderAPI geocoder = new OpenCageGeocoder();
+            geocoder.location("Gransee, Deutschland", new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    Log.e(TAG, e.getMessage());
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    try {
+                        String jsonData = response.body().string();
+
+                        ObjectMapper mapper = new ObjectMapper();
+                        OpenCageResponse res = mapper.readValue(jsonData, OpenCageResponse.class);
+
+                        for (OpenCageAnnotations annotations : res.getResults()) {
+                            annotations.getFormatted();
+                        }
+
+                        Log.d(TAG, jsonData);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
         } else {
             Toast.makeText(this, R.string.network_notavailable, Toast.LENGTH_SHORT).show();
         }
