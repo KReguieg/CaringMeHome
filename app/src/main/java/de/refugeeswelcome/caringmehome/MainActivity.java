@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
@@ -31,6 +32,14 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getName();
     String mTameResponse;
     FloatingSearchView mSearchView;
+    private boolean doubleBackToExitPressedOnce;
+    private final Runnable mRunnable = new Runnable() {
+        @Override
+        public void run() {
+            doubleBackToExitPressedOnce = false;
+        }
+    };
+    private Handler mHandler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,26 +47,45 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mSearchView = (FloatingSearchView) findViewById(R.id.floating_search_view);
-        mSearchView.setOnQueryChangeListener(new FloatingSearchView.OnQueryChangeListener() {
-            @Override
-            public void onSearchTextChanged(String oldQuery, final String newQuery) {
-
-                //get suggestions based on newQuery
-                search(newQuery);
-                //pass them on to the search view
-
-            }
-        });
-
-
-
         if (isNetworkAvailable()) {
-            callTameApi();
+            mSearchView.setOnQueryChangeListener(new FloatingSearchView.OnQueryChangeListener() {
+                @Override
+                public void onSearchTextChanged(String oldQuery, final String newQuery) {
+                    Log.d(TAG, "OLD= " + oldQuery + " NEW= " + newQuery);
+                    //get suggestions based on newQuery
+                    search(newQuery);
+                    //pass them on to the search view
+                }
+            });
+
+            mSearchView.setOnSearchListener(new FloatingSearchView.OnSearchListener() {
+                @Override
+                public void onSuggestionClicked(SearchSuggestion searchSuggestion) {
+                    mSearchView.hideProgress();
+                    Log.d(TAG, "Click on a found item in list...");
+                    LocationSuggestion locationSuggestion = (LocationSuggestion) searchSuggestion;
+                    Log.d(TAG, "LocationSuggestion= " + locationSuggestion.toString());
+                    String searchResult = locationSuggestion.getmLocation();
+                    Log.d(TAG, "SearchResult= " + searchResult.toString());
+                    Log.d(TAG, "Call tame API with= " + searchResult.split(",")[0]);
+                    callTameApi(searchResult.split(",")[0]);
+                }
+
+                @Override
+                public void onSearchAction(String currentQuery) {
+
+                }
+            });
         } else {
             Toast.makeText(this, R.string.network_notavailable, Toast.LENGTH_SHORT).show();
         }
     }
-
+    
+    /**
+     * Searches the give search text in {@link GeocoderAPI}.
+     *
+     * @param searchText The text that should be searched. Most commonly a city or another place in the world.
+     */
     public void search(String searchText) {
         GeocoderAPI geocoder = new OpenCageGeocoder();
         geocoder.location(searchText, new Callback() {
@@ -100,10 +128,12 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Calls the tame API to receive all important tweets within the given location.
+     *
+     * @param location The Location which gets searched via <a href="https://tame.it">tame.it</a>.
      * @return The JSON response as String.
      */
-    private void callTameApi() {
-        String tameApiCallUrl = urlBuilder("Damaskus");
+    private void callTameApi(String location) {
+        String tameApiCallUrl = urlBuilder(location);
 
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
@@ -141,6 +171,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Updates the tweets on your main page with the received JSON data.
+     *
      * @param jsonData the response from the API call as JSON String.
      */
     private void updateTwitterFeed(String jsonData) {
@@ -161,6 +192,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Checks if the network is available and returns the result as a boolean.
+     *
      * @return The result value for network checking as boolean.
      */
     private boolean isNetworkAvailable() {
@@ -171,5 +203,28 @@ public class MainActivity extends AppCompatActivity {
             isAvailable = true;
         }
         return isAvailable;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (mHandler != null) {
+            mHandler.removeCallbacks(mRunnable);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        if (doubleBackToExitPressedOnce) {
+            super.onBackPressed();
+            return;
+        }
+
+        this.doubleBackToExitPressedOnce = true;
+        Toast.makeText(this, R.string.clickBackToExit, Toast.LENGTH_SHORT).show();
+
+        mHandler.postDelayed(mRunnable, 2000);
     }
 }

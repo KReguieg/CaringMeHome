@@ -4,4 +4,5 @@
     <string name="error_title">Ooops! Sorry!</string>
     <string name="error_message">There was an error. Please try again.</string>
     <string name="alert_positive_button">OK</string>
+    <string name="clickBackToExit">Click back again to exit...</string>
 </resources>
