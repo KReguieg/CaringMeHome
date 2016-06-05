@@ -29,4 +29,5 @@ dependencies {
     compile 'com.fasterxml.jackson.core:jackson-annotations:2.7.3'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.7.3'
     compile 'com.github.arimorty:floatingsearchview:2.0.1'
+    compile 'com.facebook.android:facebook-android-sdk:4.+'
 }

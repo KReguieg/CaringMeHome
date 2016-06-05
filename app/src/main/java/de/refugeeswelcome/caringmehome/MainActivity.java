@@ -58,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //@TODO gets called by button or searchfield
     public void search(String searchText) {
         GeocoderAPI geocoder = new OpenCageGeocoder();
         geocoder.location(searchText, new Callback() {
