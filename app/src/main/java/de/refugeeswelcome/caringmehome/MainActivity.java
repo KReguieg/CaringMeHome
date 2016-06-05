@@ -17,8 +17,10 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.refugeeswelcome.caringmehome.model.api.crisisnet.CrisisResponse;
 import de.refugeeswelcome.caringmehome.model.api.opencage.Annotation;
 import de.refugeeswelcome.caringmehome.model.api.opencage.Response;
+import de.refugeeswelcome.caringmehome.util.CrisisNetApi;
 import de.refugeeswelcome.caringmehome.util.GeocoderAPI;
 import de.refugeeswelcome.caringmehome.util.LocationSuggestion;
 import de.refugeeswelcome.caringmehome.util.OpenCageGeocoder;
@@ -32,6 +34,11 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getName();
     String mTameResponse;
     FloatingSearchView mSearchView;
+
+    ObjectMapper mapper = new ObjectMapper();
+
+    private CrisisNetApi mCrisisApi = new CrisisNetApi();
+
     private boolean doubleBackToExitPressedOnce;
     private final Runnable mRunnable = new Runnable() {
         @Override
@@ -69,6 +76,17 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "SearchResult= " + searchResult.toString());
                     Log.d(TAG, "Call tame API with= " + searchResult.split(",")[0]);
                     callTameApi(searchResult.split(",")[0]);
+
+                    mCrisisApi.feeds(locationSuggestion.getmLat(), locationSuggestion.getmLng(), new Callback() {
+                        @Override
+                        public void onFailure(Call call, IOException e) {
+                        }
+                        @Override
+                        public void onResponse(Call call, okhttp3.Response response) throws IOException {
+                            String res = response.body().string();
+                            CrisisResponse resp = mapper.readValue(res, CrisisResponse.class);
+                        }
+                    });
                 }
 
                 @Override
@@ -80,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, R.string.network_notavailable, Toast.LENGTH_SHORT).show();
         }
     }
-    
+
     /**
      * Searches the give search text in {@link GeocoderAPI}.
      *
@@ -98,14 +116,12 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Call call, okhttp3.Response response) throws IOException {
                 try {
                     String jsonData = response.body().string();
-
-                    ObjectMapper mapper = new ObjectMapper();
                     Response res = mapper.readValue(jsonData, Response.class);
 
                     List<SearchSuggestion> suggestions = new LinkedList<>();
 
                     for (Annotation annotations : res.getResults()) {
-                        suggestions.add(new LocationSuggestion(annotations.getFormatted()));
+                        suggestions.add(new LocationSuggestion(annotations.getFormatted(), annotations.getGeometry().getLat(), annotations.getGeometry().getLng()));
                     }
 
                     showSuggestions(suggestions);

@@ -23,9 +23,13 @@ public class LocationSuggestion implements SearchSuggestion {
     };
     private String mLocation;
     private boolean mIsHistory = false;
+    private double mLat;
+    private double mLng;
 
-    public LocationSuggestion(String suggestion) {
+    public LocationSuggestion(String suggestion, double lat, double lng) {
         this.mLocation = suggestion;
+        this.mLat = lat;
+        this.mLng = lng;
     }
 
     public LocationSuggestion(Parcel source) {
@@ -35,6 +39,14 @@ public class LocationSuggestion implements SearchSuggestion {
 
     public String getmLocation() {
         return mLocation;
+    }
+
+    public double getmLat() {
+        return mLat;
+    }
+
+    public double getmLng() {
+        return mLng;
     }
 
     public void setmLocation(String mLocation) {

@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * Created by root1 on 05/06/16.
  */
-public class Response {
+public class CrisisResponse {
 
     private int total;
     private List<Data> data;

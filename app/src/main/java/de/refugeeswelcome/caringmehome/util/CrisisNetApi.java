@@ -1,5 +1,7 @@
 package de.refugeeswelcome.caringmehome.util;
 
+import android.util.Log;
+
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -15,9 +17,11 @@ public class CrisisNetApi {
     private String domain = "http://api.crisis.net/item?";
     private String locationParam="location=";
 
-    private void feeds(double lat, double lng, Callback callback) {
+    public void feeds(double lat, double lng, Callback callback) {
 
-        String url = domain + locationParam + lat + "," + lng + "&apiKey=" + apiKey;
+        String url = domain + locationParam + lat + "," + lng + "&apikey=" + apiKey;
+
+        Log.d(CrisisNetApi.class.getName(), url);
 
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
